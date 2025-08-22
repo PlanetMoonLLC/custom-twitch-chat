@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitch Chat Overlay</title>
+    <style>
+        body {
+            background-color: rgba(0, 0, 0, 0.5); /* Transparent background */
+            color: white;
+            font-family: 'Arial', sans-serif;
+            font-size: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 10px;
+        }
+
+        .chat-box {
+            width: 100%;
+            max-width: 500px;
+            border-radius: 10px;
+            border: 2px solid #00f7ff;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            overflow-y: auto;
+            max-height: 500px;
+        }
+
+        .chat-message {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            word-wrap: break-word;
+        }
+
+        .username {
+            font-weight: bold;
+            margin-right: 10px;
+            color: #00f7ff;
+        }
+
+        .flair {
+            margin-right: 10px;
+        }
+
+        .message {
+            color: #d0d0d0;
+        }
+
+        .pronouns {
+            font-style: italic;
+            color: #ff7b00;
+        }
+
+        /* Styling for icons */
+        .flair img {
+            width: 20px;
+            height: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-box">
+    <!-- Dynamic chat messages will be inserted here -->
+</div>
+
+<script>
+    const pronounsDbUrl = "https://pronouns.alejo.io/api/v1/lookup/";
+
+    function getUserPronouns(username) {
+        return fetch(pronounsDbUrl + username)
+            .then(response => response.json())
+            .then(data => data.pronouns || "Not Specified");
+    }
+
+    function createChatMessage(username, message, flair, pronouns) {
+        const chatBox = document.querySelector('.chat-box');
+
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('chat-message');
+
+        const usernameElement = document.createElement('span');
+        usernameElement.classList.add('username');
+        usernameElement.textContent = username;
+
+        const flairElement = document.createElement('span');
+        flairElement.classList.add('flair');
+        flairElement.innerHTML = `<img src="${flair}" alt="flair">`;  // Flair icon image
+
+        const messageElementText = document.createElement('span');
+        messageElementText.classList.add('message');
+        messageElementText.textContent = message;
+
+        const pronounsElement = document.createElement('span');
+        pronounsElement.classList.add('pronouns');
+        pronounsElement.textContent = pronouns;
+
+        messageElement.append(usernameElement, flairElement, messageElementText, pronounsElement);
+        chatBox.appendChild(messageElement);
+    }
+
+    // Example Usage (simulate incoming chat)
+    createChatMessage("servosphäb", "Lorem ipsum dolor sit amet.", "trans-flag-icon.png", "he/him");
+
+    // Fetch pronouns dynamically
+    async function fetchAndDisplayMessage(username, message, flair) {
+        const pronouns = await getUserPronouns(username);
+        createChatMessage(username, message, flair, pronouns);
+    }
+
+    // Example to test fetching user info
+    fetchAndDisplayMessage("evrar", "Hello, world!", "non-binary-flag-icon.png");
+
+</script>
+
+</body>
+</html>
